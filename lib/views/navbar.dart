@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'dashboardcustomer.dart';
 import 'pembayaranpage.dart';
 import 'profilepage.dart';
+import 'produkpage.dart';    
+import 'keranjangpage.dart';  
+import '../models/keranjangmodel.dart';
 
 class Navbar extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -17,71 +20,84 @@ class _NavbarState extends State<Navbar> {
 
   @override
   Widget build(BuildContext context) {
-    // Warna biru ikon sesuai gambar mockup yang Anda kirim
     const activeBlue = Color(0xFF004D73);
-    // Warna abu-abu untuk ikon yang sedang tidak aktif
     const inactiveGrey = Color(0xFF8E8E93);
 
+    // Daftar halaman aplikasi
     final pages = [
       DashboardCustomer(
         userData: widget.userData,
         onBayarSekarangPressed: () {
           setState(() {
-            _currentIndex = 1;
+            _currentIndex = 2; // Pindah ke tab keranjang
           });
         },
       ),
-      const PembayaranPage(),
-      ProfilView(userData: widget.userData),
+      ProdukPage(
+        onProdukDitambahkan: () {
+          setState(() {}); // Refresh Navbar untuk memperbarui angka badge belanjaan
+        },
+      ),    
+      const KeranjangPage(), 
+      ProfilView(userData: widget.userData), 
     ];
 
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: pages),
+      // PERBAIKAN: Menggunakan pemanggilan dinamis bukan IndexedStack agar halaman me-refresh otomatis
+      body: pages[_currentIndex], 
       bottomNavigationBar: Container(
-        // Memberikan border atas tipis agar terlihat rapi dan elegan membatasi konten
         decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.grey.shade200, width: 1),
-          ),
+          border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           type: BottomNavigationBarType.fixed,
-          backgroundColor:
-              Colors.white, // Latar belakang putih bersih sesuai gambar
-          selectedItemColor: activeBlue, // Ikon & Teks menjadi Biru saat diklik
-          unselectedItemColor:
-              inactiveGrey, // Ikon & Teks menjadi Abu-abu saat tidak aktif
-          selectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-          ),
+          backgroundColor: Colors.white,
+          selectedItemColor: activeBlue,
+          unselectedItemColor: inactiveGrey,
+          selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+          unselectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.normal),
           onTap: (index) {
             setState(() {
               _currentIndex = index;
             });
           },
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home_outlined,
-              ), // Menggunakan versi outline agar lebih clean
+          items: [
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
               activeIcon: Icon(Icons.home),
-              label:
-                  'Beranda', // Mengubah 'Dashboard' menjadi 'Beranda' sesuai gambar
+              label: 'Beranda',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.grid_view_outlined),
+              activeIcon: Icon(Icons.grid_view_rounded),
+              label: 'Produk',
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.credit_card_outlined,
-              ), // Ikon kartu/pembayaran minimalis
-              activeIcon: Icon(Icons.credit_card),
-              label: 'Pembayaran',
+              icon: Stack(
+                children: [
+                  const Icon(Icons.shopping_cart_outlined),
+                  if (daftarKeranjangGlobal.isNotEmpty)
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                        constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                        child: Text(
+                          '${daftarKeranjangGlobal.fold<int>(0, (sum, item) => sum + item.quantity)}',
+                          style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              activeIcon: const Icon(Icons.shopping_cart),
+              label: 'Keranjang',
             ),
-            BottomNavigationBarItem(
+            const BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               activeIcon: Icon(Icons.person),
               label: 'Profil',
