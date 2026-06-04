@@ -67,8 +67,9 @@ class MyApp extends StatelessWidget {
         '/profiladmin': (context) => const ProfilAdminPage(),
         '/keranjang': (context) =>
             const KeranjangPage(), // Tambahkan route untuk halaman keranjang
-        '/produk': (context) =>
-            ProdukPage(onProdukDitambahkan: () {  },), // Tambahkan route untuk halaman produk
+        '/produk': (context) => ProdukPage(
+          onProdukDitambahkan: () {},
+        ), // Tambahkan route untuk halaman produk
         '/checkoutsuccess': (context) =>
             const CheckoutSuccessPage(totalTransfer: 0),
         // Tambahkan route untuk halaman checkout sukses

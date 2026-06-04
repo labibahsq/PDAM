@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dashboardcustomer.dart';
-import 'pembayaranpage.dart';
+import 'pembayaranpage.dart'; // ✅ Tetap diimport
 import 'profilepage.dart';
-import 'produkpage.dart';    
-import 'keranjangpage.dart';  
+import 'produkpage.dart';
+import 'keranjangpage.dart';
 import '../models/keranjangmodel.dart';
 
 class Navbar extends StatefulWidget {
@@ -23,40 +23,53 @@ class _NavbarState extends State<Navbar> {
     const activeBlue = Color(0xFF004D73);
     const inactiveGrey = Color(0xFF8E8E93);
 
-    // Daftar halaman aplikasi
+    // ✅ Susunan 5 halaman lengkap tanpa menghilangkan PembayaranPage
     final pages = [
       DashboardCustomer(
         userData: widget.userData,
         onBayarSekarangPressed: () {
           setState(() {
-            _currentIndex = 2; // Pindah ke tab keranjang
+            _currentIndex =
+                1; // Jika pencet "Bayar Sekarang" di beranda, oper ke tab Pembayaran
           });
         },
       ),
+      const PembayaranPage(), // ✅ Index 1: Halaman Pembayaran Anda kembali aktif
       ProdukPage(
         onProdukDitambahkan: () {
-          setState(() {}); // Refresh Navbar untuk memperbarui angka badge belanjaan
+          setState(
+            () {},
+          ); // Refresh Navbar untuk memperbarui angka badge belanjaan
         },
-      ),    
-      const KeranjangPage(), 
-      ProfilView(userData: widget.userData), 
+      ),
+      const KeranjangPage(), // Index 3: Halaman Keranjang Belanja
+      ProfilView(userData: widget.userData), // Index 4: Halaman Profil
     ];
 
     return Scaffold(
-      // PERBAIKAN: Menggunakan pemanggilan dinamis bukan IndexedStack agar halaman me-refresh otomatis
-      body: pages[_currentIndex], 
+      // Menggunakan pemanggilan dinamis agar halaman me-refresh otomatis saat berpindah tab
+      body: pages[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: Colors.grey.shade200, width: 1)),
+          border: Border(
+            top: BorderSide(color: Colors.grey.shade200, width: 1),
+          ),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          type: BottomNavigationBarType.fixed,
+          type: BottomNavigationBarType
+              .fixed, // Tetap fixed agar muat 5 menu dengan rapi
           backgroundColor: Colors.white,
           selectedItemColor: activeBlue,
           unselectedItemColor: inactiveGrey,
-          selectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-          unselectedLabelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.normal),
+          selectedLabelStyle: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+          ), // Ukuran font sedikit dikecilkan agar muat 5 menu
+          unselectedLabelStyle: const TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.normal,
+          ),
           onTap: (index) {
             setState(() {
               _currentIndex = index;
@@ -67,6 +80,12 @@ class _NavbarState extends State<Navbar> {
               icon: Icon(Icons.home_outlined),
               activeIcon: Icon(Icons.home),
               label: 'Beranda',
+            ),
+            // ✅ MENU PEMBAYARAN KEMBALI DI NAVBAR
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.credit_card_outlined),
+              activeIcon: Icon(Icons.credit_card),
+              label: 'Pembayaran',
             ),
             const BottomNavigationBarItem(
               icon: Icon(Icons.grid_view_outlined),
@@ -83,11 +102,21 @@ class _NavbarState extends State<Navbar> {
                       top: 0,
                       child: Container(
                         padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                        constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 14,
+                          minHeight: 14,
+                        ),
                         child: Text(
                           '${daftarKeranjangGlobal.fold<int>(0, (sum, item) => sum + item.quantity)}',
-                          style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.bold,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ),
